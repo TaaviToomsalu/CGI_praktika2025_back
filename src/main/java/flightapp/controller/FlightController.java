@@ -2,8 +2,10 @@ package flightapp.controller;
 
 import flightapp.model.Flight;
 import flightapp.service.FlightService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -16,7 +18,12 @@ public class FlightController {
     }
 
     @GetMapping
-    public List<Flight> getFlights() {
-        return flightService.getAllFlights();
+    public List<Flight> searchFlights(
+            @RequestParam(required = false) String destination,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(required = false) Double maxPrice) {
+
+        return flightService.searchFlights(destination, startDate, endDate, maxPrice);
     }
 }
