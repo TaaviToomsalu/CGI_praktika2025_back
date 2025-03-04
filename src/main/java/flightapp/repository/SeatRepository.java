@@ -13,4 +13,6 @@ import java.util.List;
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     @Query("SELECT s FROM Seat s WHERE s.flight.id = :flightId")
     List<Seat> findByFlightId(@Param("flightId")Long flightId);
+
+    List<Seat> findByFlightIdAndOccupiedFalse(Long flightId);
 }

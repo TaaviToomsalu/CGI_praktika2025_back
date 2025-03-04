@@ -44,4 +44,23 @@ public class SeatService {
         seatRepository.save(seat);
     }
 
+    public void reserveMultipleSeats(Long flightId, List<Long> seatIds) {
+        List<Seat> seats = seatRepository.findAllById(seatIds);
+
+        // Kontrollime, kas kõik valitud kohad on vabad
+        for (Seat seat : seats) {
+            if (seat.isOccupied() || !seat.getFlight().getId().equals(flightId)) {
+                throw new RuntimeException("One or more seats are already occupied or do not belong to this flight");
+            }
+        }
+
+        //Märgib kohad broneerituks
+        seats.forEach(seat -> seat.setOccupied(true));
+        seatRepository.saveAll(seats);
+    }
+
+    public List<Seat> getAvailableSeatsForFlight(Long flightId) {
+        return seatRepository.findByFlightIdAndOccupiedFalse(flightId);
+    }
+
 }
