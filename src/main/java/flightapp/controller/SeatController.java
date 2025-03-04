@@ -2,6 +2,7 @@ package flightapp.controller;
 
 import flightapp.model.Seat;
 import flightapp.service.SeatService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,4 +28,16 @@ public class SeatController {
     public Optional<Seat> suggestSeat(@PathVariable Long flightId, @RequestParam String preference) {
         return seatService.suggestSeat(flightId, preference);
     }
+
+    @PutMapping("/{seatId}/reserve")
+    public ResponseEntity<String> reserveSeat(@PathVariable Long seatId) {
+        try {
+            seatService.reserveSeat(seatId);
+            return ResponseEntity.ok("Seat reserved succesfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
 }

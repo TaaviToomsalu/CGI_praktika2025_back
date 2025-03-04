@@ -29,4 +29,17 @@ public class SeatService {
                 .filter(seat -> seat.getSeatType().equalsIgnoreCase(preference))
                 .findFirst();
     }
+
+    public void reserveSeat(Long seatId) {
+        Seat seat = seatRepository.findById(seatId)
+                .orElseThrow(() -> new RuntimeException("Seat not found"));
+
+        if (seat.isOccupied()) {
+            throw new RuntimeException("Seat is already occupied");
+        }
+
+        seat.setOccupied(true);
+        seatRepository.save(seat);
+    }
+
 }
