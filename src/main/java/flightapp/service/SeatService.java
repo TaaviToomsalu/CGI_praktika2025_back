@@ -4,6 +4,7 @@ import flightapp.model.Seat;
 import flightapp.repository.SeatRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,9 +26,10 @@ public class SeatService {
 
         //Filtreeri vabad istekohad ja leia sobiv
         return seats.stream()
-                .filter(seat -> !seat.isOccupied())
-                .filter(seat -> seat.getSeatType().equalsIgnoreCase(preference))
-                .findFirst();
+                .filter(seat -> !seat.isOccupied()) //Ainult vabad istekohad
+                // kui eelistus any, tagastab ükskõik millise vaba koha. min sorteerib rea numbri järgi, et eelistada eespool asuvaid kohti
+                .filter(seat -> "any".equalsIgnoreCase(preference) || seat.getSeatType().equalsIgnoreCase(preference))
+                .min(Comparator.comparingInt(seat -> Integer.parseInt(seat.getSeatNumber().replaceAll("[^0-9]", ""))));
     }
 
     public void reserveSeat(Long seatId) {
