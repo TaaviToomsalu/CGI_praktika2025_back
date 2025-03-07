@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class DataInitializer {
@@ -34,16 +36,23 @@ public class DataInitializer {
         for (int row = 1; row <= 6; row++) {
             for (char seat = 'A'; seat <= 'D'; seat++) {
                 boolean occupied = Math.random() < 0.3;
+                List<String> seatTypes = new ArrayList<>();
 
-                String seatType = switch (seat) {
-                    case 'A' -> "window";
-                    case 'B' -> "aisle";
-                    case 'C' -> "aisle";
-                    case 'D' -> "window";
-                    default -> "standard";
-                };
+                // Lisa aknaalused kohad
+                if (seat == 'A' || seat == 'D'){
+                    seatTypes.add("window");
+                }
 
-                seatRepository.save(new Seat(row + "" + seat, occupied, seatType, flight));
+                //Esimene rida = rohkem jalaruumi
+                if (row == 1) {
+                    seatTypes.add("extra_legroom");
+                }
+
+                //Esimene ja viimane rida = väljapääsu lähedal
+                if (row == 1 || row == 6) {
+                    seatTypes.add("near_exit");
+                }
+                seatRepository.save(new Seat(row + "" + seat, occupied, seatTypes, flight));
             }
         }
     }

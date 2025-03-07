@@ -4,7 +4,7 @@ import flightapp.model.Seat;
 import flightapp.service.SeatService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import flightapp.dto.SeatReservationRequest;
+import flightapp.request.SeatReservationRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +26,10 @@ public class SeatController {
 
     //Soovitab istekoha eelistuse järgi
     @GetMapping("/{flightId}/suggest")
-    public Optional<Seat> suggestSeat(@PathVariable Long flightId, @RequestParam String preference) {
-        return seatService.suggestSeat(flightId, preference);
+    public List<Seat> suggestSeats(@PathVariable Long flightId,
+                                   @RequestParam int numSeats,
+                                   @RequestParam List<String> preferences) {
+        return seatService.suggestSeats(flightId, numSeats, preferences);
     }
 
     @GetMapping("/{flightId}/available")
@@ -39,7 +41,7 @@ public class SeatController {
     public ResponseEntity<String> reserveSeat(@PathVariable Long seatId) {
         try {
             seatService.reserveSeat(seatId);
-            return ResponseEntity.ok("Seat reserved succesfully");
+            return ResponseEntity.ok("Seat reserved successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -49,7 +51,7 @@ public class SeatController {
     public ResponseEntity<String> reserveSeats(@RequestBody SeatReservationRequest request) {
         try {
             seatService.reserveMultipleSeats(request.getFlightId(), request.getSeatIds());
-            return ResponseEntity.ok("Seats reserved succesfully");
+            return ResponseEntity.ok("Seats reserved successfully");
         }catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

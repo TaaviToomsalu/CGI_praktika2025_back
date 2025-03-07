@@ -2,6 +2,8 @@ package flightapp.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "seats")
 public class Seat {
@@ -11,7 +13,8 @@ public class Seat {
 
     private String seatNumber;
     private boolean occupied;
-    private String seatType;
+    @ElementCollection
+    private List<String> seatTypes; // "window", "aisle", "extra_legroom", "exit_row"
 
     @ManyToOne
     @JoinColumn(name = "flight_id")
@@ -19,12 +22,13 @@ public class Seat {
 
     public Seat() {}
 
-    public Seat(String seatNumber, boolean occupied, String seatType, Flight flight) {
+    public Seat(String seatNumber, boolean occupied, List<String> seatTypes, Flight flight) {
         this.seatNumber = seatNumber;
         this.occupied = occupied;
-        this.seatType = seatType;
+        this.seatTypes = seatTypes;
         this.flight = flight;
     }
+
 
     public Long getId() {
         return id;
@@ -46,12 +50,12 @@ public class Seat {
         this.occupied = occupied;
     }
 
-    public String getSeatType() {
-        return seatType;
+    public List<String> getSeatTypes() {
+        return seatTypes;
     }
 
-    public void setSeatType(String seatType) {
-        this.seatType = seatType;
+    public void setSeatTypes(List<String> seatTypes) {
+        this.seatTypes = seatTypes;
     }
 
     public Flight getFlight() {
