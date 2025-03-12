@@ -22,13 +22,20 @@ public class SeatService {
         return seatRepository.findByFlightId(flightId);
     }
 
-    public List<Seat> suggestSeats(Long flightId, int numSeats, List<String> preferences) {
-        List<Seat> seats = seatRepository.findByFlightId(flightId);
+    public List<Seat> suggestSeats(Long flightId,
+                                   int numSeats,
+                                   List<String> preferences,
+                                   boolean requireAdjacent) {
+        List<Seat> seats = getSeatsForFlight(flightId);
+        System.out.println("Total seats found for flight " + flightId + ": " + seats.size());
+
 
         // Filtreeri vabad istekohad
         List<Seat> availableSeats = seats.stream()
                 .filter(seat -> !seat.isOccupied()) // Ainult vabad istekohad
                 .collect(Collectors.toList());
+
+        System.out.println("Available seats: " + availableSeats.size());
 
         // Filtreeri vastavalt iga eelistuse järgi
         for (String preference : preferences) {
@@ -37,16 +44,24 @@ public class SeatService {
                     .collect(Collectors.toList());
         }
 
-        // Kui mitu kohta tuleb broneerida, leia kõrvuti olevad kohad
-        if (numSeats > 1) {
-            return findAdjacentSeats(availableSeats, numSeats);
+        System.out.println("Seats after filtering by preferences (" + preferences + "): " + availableSeats.size());
+
+        if (numSeats > 1 && requireAdjacent) {
+            List<Seat> adjacentSeats = findAdjacentSeats(availableSeats, numSeats);
+            System.out.println("Adjacent seats found: " + adjacentSeats.size());
+            if (!adjacentSeats.isEmpty()) {
+                return adjacentSeats;  // ✅ Return adjacent seats if found
+            }
         }
 
-        // Vali sobiv koht
-        return availableSeats.stream()
-                .min(Comparator.comparingInt(seat -> Integer.parseInt(seat.getSeatNumber().replaceAll("[^0-9]", ""))))
-                .map(Collections::singletonList)
-                .orElse(Collections.emptyList());
+        // If adjacent seats weren’t found or not required, return any available ones
+        List<Seat> selectedSeats = availableSeats.stream()
+                .limit(numSeats)
+                .collect(Collectors.toList());
+
+        System.out.println("Final suggested seats: " + selectedSeats.size());
+
+        return selectedSeats;
     }
 
     private List<Seat> findAdjacentSeats(List<Seat> availableSeats, int numSeats) {
@@ -66,39 +81,31 @@ public class SeatService {
                     break;
                 }
             }
-
             if (adjacent) {
                 return availableSeats.subList(i, i + numSeats);
             }
         }
-
         return Collections.emptyList(); // Kui ei leitud, tagasta tühi list
     }
 
-
-    public void reserveSeat(Long seatId) {
-        Seat seat = seatRepository.findById(seatId)
-                .orElseThrow(() -> new RuntimeException("Seat not found"));
-
-        if (seat.isOccupied()) {
-            throw new RuntimeException("Seat is already occupied");
+    public void reserveSeats(Long flightId, List<String> seatIds) {
+        if (seatIds == null || seatIds.isEmpty()) { // Kontrollime, et list ei oleks tühi
+            throw new RuntimeException("No seats selected for reservation.");
         }
 
-        seat.setOccupied(true);
-        seatRepository.save(seat);
-    }
+        System.out.println("Checking seat IDs: " + seatIds);
+        List<Seat> seats = seatRepository.findByFlightIdAndSeatNumberIn(flightId, seatIds);
 
-    public void reserveMultipleSeats(Long flightId, List<Long> seatIds) {
-        List<Seat> seats = seatRepository.findAllById(seatIds);
+        System.out.println("Seats found in DB: " + seats.size());
 
-        // Kontrollime, kas kõik valitud kohad on vabad
+        // Kontrollime, kas kõik valitud kohad kuuluvad õigesse lendu ja on vabad
         for (Seat seat : seats) {
-            if (seat.isOccupied() || !seat.getFlight().getId().equals(flightId)) {
-                throw new RuntimeException("One or more seats are already occupied or do not belong to this flight");
+            if (seat.isOccupied()) {
+                throw new RuntimeException("Seat " + seat.getSeatNumber() + " is already occupied");
             }
         }
 
-        //Märgib kohad broneerituks
+        // Märgime kõik valitud kohad broneerituks
         seats.forEach(seat -> seat.setOccupied(true));
         seatRepository.saveAll(seats);
     }

@@ -28,8 +28,12 @@ public class SeatController {
     @GetMapping("/{flightId}/suggest")
     public List<Seat> suggestSeats(@PathVariable Long flightId,
                                    @RequestParam int numSeats,
-                                   @RequestParam List<String> preferences) {
-        return seatService.suggestSeats(flightId, numSeats, preferences);
+                                   @RequestParam List<String> preferences,
+                                    @RequestParam(required = false, defaultValue = "false") boolean requireAdjacent) {
+
+        System.out.println("Received request: flightId=" + flightId + ", numSeats=" + numSeats + ", preferences=" + preferences + ", requireAdjacent=" + requireAdjacent);
+
+        return seatService.suggestSeats(flightId, numSeats, preferences, requireAdjacent);
     }
 
     @GetMapping("/{flightId}/available")
@@ -37,24 +41,16 @@ public class SeatController {
         return seatService.getAvailableSeatsForFlight(flightId);
     }
 
-    @PutMapping("/{seatId}/reserve")
-    public ResponseEntity<String> reserveSeat(@PathVariable Long seatId) {
-        try {
-            seatService.reserveSeat(seatId);
-            return ResponseEntity.ok("Seat reserved successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     @PutMapping("/reserve")
     public ResponseEntity<String> reserveSeats(@RequestBody SeatReservationRequest request) {
+        System.out.println("Received Flight ID: " + request.getFlightId());
+        System.out.println("Received Seat IDs: " + request.getSeatIds()); // Kontrolli, mis väärtused tulevad
+
         try {
-            seatService.reserveMultipleSeats(request.getFlightId(), request.getSeatIds());
+            seatService.reserveSeats(request.getFlightId(), request.getSeatIds());
             return ResponseEntity.ok("Seats reserved successfully");
-        }catch (RuntimeException e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 }

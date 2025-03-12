@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SeatReservationRequest {
     private Long flightId;
-    private List<Long> seatIds;
+    private List<String> seatIds;
     private int numSeats;
     private List<String> preferences;
 
@@ -17,11 +17,11 @@ public class SeatReservationRequest {
         this.flightId = flightId;
     }
 
-    public List<Long> getSeatIds() {
+    public List<String> getSeatIds() {
         return seatIds;
     }
 
-    public void setSeatIds(List<Long> seatIds) {
+    public void setSeatIds(List<String> seatIds) {
         this.seatIds = seatIds;
     }
 
