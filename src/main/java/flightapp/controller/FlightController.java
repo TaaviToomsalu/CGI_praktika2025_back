@@ -17,13 +17,20 @@ public class FlightController {
         this.flightService = flightService;
     }
 
-    @GetMapping
-    public List<Flight> searchFlights(
+
+    @GetMapping("/")
+    public List<Flight> getAllFlights() {
+        return flightService.getAllFlights();
+    }
+
+    @GetMapping("/filter")
+    public List<Flight> filterFlights(
             @RequestParam(required = false) String destination,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam(required = false) Double maxPrice) {
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false, defaultValue = "economy") String seatClass) {
 
-        return flightService.searchFlights(destination, startDate, endDate, maxPrice);
+        return flightService.searchFlights(destination, startDate, endDate, maxPrice, seatClass);
     }
 }

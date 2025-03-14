@@ -27,15 +27,12 @@ public class SeatService {
                                    List<String> preferences,
                                    boolean requireAdjacent) {
         List<Seat> seats = getSeatsForFlight(flightId);
-        System.out.println("Total seats found for flight " + flightId + ": " + seats.size());
 
 
         // Filtreeri vabad istekohad
         List<Seat> availableSeats = seats.stream()
                 .filter(seat -> !seat.isOccupied()) // Ainult vabad istekohad
                 .collect(Collectors.toList());
-
-        System.out.println("Available seats: " + availableSeats.size());
 
         // Filtreeri vastavalt iga eelistuse järgi
         for (String preference : preferences) {
@@ -44,11 +41,8 @@ public class SeatService {
                     .collect(Collectors.toList());
         }
 
-        System.out.println("Seats after filtering by preferences (" + preferences + "): " + availableSeats.size());
-
         if (numSeats > 1 && requireAdjacent) {
             List<Seat> adjacentSeats = findAdjacentSeats(availableSeats, numSeats);
-            System.out.println("Adjacent seats found: " + adjacentSeats.size());
             if (!adjacentSeats.isEmpty()) {
                 return adjacentSeats;  // ✅ Return adjacent seats if found
             }
@@ -58,8 +52,6 @@ public class SeatService {
         List<Seat> selectedSeats = availableSeats.stream()
                 .limit(numSeats)
                 .collect(Collectors.toList());
-
-        System.out.println("Final suggested seats: " + selectedSeats.size());
 
         return selectedSeats;
     }
@@ -92,11 +84,7 @@ public class SeatService {
         if (seatIds == null || seatIds.isEmpty()) { // Kontrollime, et list ei oleks tühi
             throw new RuntimeException("No seats selected for reservation.");
         }
-
-        System.out.println("Checking seat IDs: " + seatIds);
         List<Seat> seats = seatRepository.findByFlightIdAndSeatNumberIn(flightId, seatIds);
-
-        System.out.println("Seats found in DB: " + seats.size());
 
         // Kontrollime, kas kõik valitud kohad kuuluvad õigesse lendu ja on vabad
         for (Seat seat : seats) {

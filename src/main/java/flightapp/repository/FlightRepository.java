@@ -14,6 +14,8 @@ import java.util.List;
 public interface FlightRepository extends JpaRepository<Flight, Long>{
     List<Flight> findByDestinationContainingIgnoreCase(String destination);
     List<Flight> findByDepartureTimeBetween(LocalDateTime start, LocalDateTime end);
-    List<Flight> findByPriceLessThanEqual(Double maxPrice);
+    List<Flight> findByEconomyPriceLessThanEqual(Double maxPrice);
+    List<Flight> findByBusinessPriceLessThanEqual(Double maxPrice);
+    List<Flight> findByFirstClassPriceLessThanEqual(Double maxPrice);
 
 }

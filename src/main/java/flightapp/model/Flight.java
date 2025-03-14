@@ -1,7 +1,6 @@
 package flightapp.model;
 
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
@@ -14,14 +13,18 @@ public class Flight {
 
     private String destination;
     private LocalDateTime departureTime;
-    private double price;
+    private double economyPrice;
+    private double businessPrice;
+    private double firstClassPrice;
 
     public Flight() {}
 
-    public Flight(String destination, LocalDateTime departureTime, double price) {
+    public Flight(String destination, LocalDateTime departureTime, double economyPrice, double businessPrice, double firstClassPrice) {
         this.destination = destination;
         this.departureTime = departureTime;
-        this.price = price;
+        this.economyPrice = economyPrice;
+        this.businessPrice = businessPrice;
+        this.firstClassPrice = firstClassPrice;
     }
 
     public Long getId() {
@@ -44,11 +47,27 @@ public class Flight {
         this.departureTime = departureTime;
     }
 
-    public double getPrice() {
-        return price;
+    public double getEconomyPrice() {
+        return economyPrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public double getBusinessPrice() {
+        return businessPrice;
+    }
+
+    public double getFirstClassPrice() {
+        return firstClassPrice;
+    }
+
+    public void setEconomyPrice(double economyPrice) {
+        this.economyPrice = economyPrice;
+    }
+
+    public void setBusinessPrice(double businessPrice) {
+        this.businessPrice = businessPrice;
+    }
+
+    public void setFirstClassPrice(double firstClassPrice) {
+        this.firstClassPrice = firstClassPrice;
     }
 }

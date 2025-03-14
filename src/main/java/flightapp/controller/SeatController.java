@@ -31,8 +31,6 @@ public class SeatController {
                                    @RequestParam List<String> preferences,
                                     @RequestParam(required = false, defaultValue = "false") boolean requireAdjacent) {
 
-        System.out.println("Received request: flightId=" + flightId + ", numSeats=" + numSeats + ", preferences=" + preferences + ", requireAdjacent=" + requireAdjacent);
-
         return seatService.suggestSeats(flightId, numSeats, preferences, requireAdjacent);
     }
 
@@ -43,9 +41,6 @@ public class SeatController {
 
     @PutMapping("/reserve")
     public ResponseEntity<String> reserveSeats(@RequestBody SeatReservationRequest request) {
-        System.out.println("Received Flight ID: " + request.getFlightId());
-        System.out.println("Received Seat IDs: " + request.getSeatIds()); // Kontrolli, mis väärtused tulevad
-
         try {
             seatService.reserveSeats(request.getFlightId(), request.getSeatIds());
             return ResponseEntity.ok("Seats reserved successfully");

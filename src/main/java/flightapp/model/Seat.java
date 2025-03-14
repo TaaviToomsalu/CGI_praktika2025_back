@@ -16,16 +16,20 @@ public class Seat {
     @ElementCollection
     private List<String> seatTypes; // "window", "aisle", "extra_legroom", "exit_row"
 
+    @Enumerated(EnumType.STRING)
+    private SeatClass classType;
+
     @ManyToOne
     @JoinColumn(name = "flight_id")
     private Flight flight;
 
     public Seat() {}
 
-    public Seat(String seatNumber, boolean occupied, List<String> seatTypes, Flight flight) {
+    public Seat(String seatNumber, boolean occupied, List<String> seatTypes, SeatClass classType, Flight flight) {
         this.seatNumber = seatNumber;
         this.occupied = occupied;
         this.seatTypes = seatTypes;
+        this.classType = classType;
         this.flight = flight;
     }
 
