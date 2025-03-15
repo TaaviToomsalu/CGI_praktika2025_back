@@ -21,7 +21,6 @@ public class SeatService {
     public List<Seat> getSeatsForFlight(Long flightId) {
         return seatRepository.findByFlightId(flightId);
     }
-
     public List<Seat> suggestSeats(Long flightId,
                                    int numSeats,
                                    List<String> preferences,

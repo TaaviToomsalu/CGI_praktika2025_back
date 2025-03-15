@@ -69,4 +69,12 @@ public class Seat {
     public void setFlight(Flight flight) {
         this.flight = flight;
     }
+
+    public SeatClass getClassType() {
+        return classType;
+    }
+
+    public void setClassType(SeatClass classType) {
+        this.classType = classType;
+    }
 }

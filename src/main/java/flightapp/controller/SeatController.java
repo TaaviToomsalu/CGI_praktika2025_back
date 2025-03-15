@@ -20,10 +20,22 @@ public class SeatController {
 
     //Tagastab kõik istekoha valikud konkreetse lennu jaoks
     @GetMapping("/{flightId}")
-    public List<Seat> getSeats(@PathVariable Long flightId) {
-        return seatService.getSeatsForFlight(flightId);
-    }
+    public List<Seat> getSeats(@PathVariable Long flightId,
+                               @RequestParam(value = "class", required = false) String seatClass) {
+        System.out.println("Fetching seats for flightId: " + flightId);
+        System.out.println("seatClass from frontend: '" + seatClass + "'");
 
+        List<Seat> seats = seatService.getSeatsForFlight(flightId);
+
+        if (seatClass != null) {
+            seats = seats.stream()
+                    .filter(seat -> seatClass.equalsIgnoreCase(seat.getClassType().name()))
+                    .toList();
+        }
+
+        System.out.println("Returning " + seats.size() + " seats");
+        return seats;
+    }
     //Soovitab istekoha eelistuse järgi
     @GetMapping("/{flightId}/suggest")
     public List<Seat> suggestSeats(@PathVariable Long flightId,
