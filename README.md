@@ -45,7 +45,7 @@ Kõik istekoha valikud lennu jaoks
 
 GET /seats/{flightId}
 
-### Parameetrid:
+ Parameetrid:
 
 flightId – lennu ID
 
