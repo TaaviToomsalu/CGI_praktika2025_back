@@ -33,50 +33,59 @@ public class SeatService {
         try {
             enumClass = SeatClass.valueOf(seatClass.toUpperCase());
         } catch (IllegalArgumentException e) {
-            System.out.println("Invalid seat class: " + seatClass);
-            return Collections.emptyList(); // Tagasta tühi list, kui seatClass ei sobi
+            return Collections.emptyList();
         }
 
-        // Filtreeri ainult seatClassile vastavad istekohad
         List<Seat> availableSeats = seats.stream()
                 .filter(seat -> seat.getClassType() == enumClass)
-                .filter(seat -> !seat.isOccupied()) // Ainult vabad istekohad
+                .filter(seat -> !seat.isOccupied())
                 .collect(Collectors.toList());
 
-        // Filtreeri vastavalt iga eelistuse järgi
         for (String preference : preferences) {
             availableSeats = availableSeats.stream()
                     .filter(seat -> "any".equalsIgnoreCase(preference) || seat.getSeatTypes().contains(preference))
                     .collect(Collectors.toList());
-        }
+        } // <-- Sulge tsükkel õigesti!
 
         if (numSeats > 1 && requireAdjacent) {
             List<Seat> adjacentSeats = findAdjacentSeats(availableSeats, numSeats);
             if (!adjacentSeats.isEmpty()) {
-                return adjacentSeats;  // ✅ Return adjacent seats if found
+                return adjacentSeats;
             }
         }
 
-        // If adjacent seats weren’t found or not required, return any available ones
-        List<Seat> selectedSeats = availableSeats.stream()
-                .limit(numSeats)
-                .collect(Collectors.toList());
-
-        return selectedSeats;
+        return availableSeats.stream().limit(numSeats).collect(Collectors.toList()); // <-- Veendu, et siin on return!
     }
 
     private List<Seat> findAdjacentSeats(List<Seat> availableSeats, int numSeats) {
-        // Sorteeri kohad numbri järgi (eeldades, et istekohtadel on arvuline osa)
-        availableSeats.sort(Comparator.comparingInt(seat -> Integer.parseInt(seat.getSeatNumber().replaceAll("[^0-9]", ""))));
+        // Eemaldame mittekohased sümbolid ja kontrollime, et seatNumber sisaldab arvu
+        availableSeats.sort(Comparator.comparingInt(seat -> {
+            String numberPart = seat.getSeatNumber().replaceAll("[^0-9]", "");
+            return numberPart.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(numberPart);
+        }));
 
         for (int i = 0; i <= availableSeats.size() - numSeats; i++) {
             boolean adjacent = true;
 
-            for (int j = 0; j < numSeats - 1; j++) {
-                int currentSeatNumber = Integer.parseInt(availableSeats.get(i + j).getSeatNumber().replaceAll("[^0-9]", ""));
-                int nextSeatNumber = Integer.parseInt(availableSeats.get(i + j + 1).getSeatNumber().replaceAll("[^0-9]", ""));
+            // Enne tsüklit loome numbriliste istekohtade listi, et vältida topeltarvutusi
+            List<Integer> seatNumbers = availableSeats.stream()
+                    .map(seat -> {
+                        String numPart = seat.getSeatNumber().replaceAll("[^0-9]", "");
+                        return numPart.isEmpty() ? -1 : Integer.parseInt(numPart);
+                    })
+                    .collect(Collectors.toList());
 
-                // Kontrolli, kas järgmine koht on järjestikune
+            for (int j = 0; j < numSeats - 1; j++) {
+                int currentSeatNumber = seatNumbers.get(i + j);
+                int nextSeatNumber = seatNumbers.get(i + j + 1);
+
+                // Kui numPart oli tühi ja me kasutasime -1, siis see koht on vigane, ignoreeri
+                if (currentSeatNumber == -1 || nextSeatNumber == -1) {
+                    adjacent = false;
+                    break;
+                }
+
+                // Kontrollime, kas istekoht on järjestikune
                 if (nextSeatNumber != currentSeatNumber + 1) {
                     adjacent = false;
                     break;
@@ -86,7 +95,7 @@ public class SeatService {
                 return availableSeats.subList(i, i + numSeats);
             }
         }
-        return Collections.emptyList(); // Kui ei leitud, tagasta tühi list
+        return Collections.emptyList();
     }
 
     public void reserveSeats(Long flightId, List<String> seatIds) {

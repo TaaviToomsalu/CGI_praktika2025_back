@@ -32,8 +32,6 @@ public class SeatController {
                     .filter(seat -> seatClass.equalsIgnoreCase(seat.getClassType().name()))
                     .toList();
         }
-
-        System.out.println("Returning " + seats.size() + " seats");
         return seats;
     }
     //Soovitab istekoha eelistuse järgi
@@ -43,8 +41,6 @@ public class SeatController {
                                    @RequestParam List<String> preferences,
                                    @RequestParam(required = false, defaultValue = "false") boolean requireAdjacent,
                                    @RequestParam String seatClass) {
-
-        System.out.println("Received preferences: " + preferences); // Debugging log
 
         return seatService.suggestSeats(flightId, numSeats, preferences, requireAdjacent, seatClass);
     }

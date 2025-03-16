@@ -67,8 +67,8 @@ public class DataInitializer {
                     seatTypes.add("window");
                 }
 
-                // Esimene rida rohkem jalaruumi
-                if (row == 1) {
+                // Extra legroom ainult iga klassi esimesel real
+                if (row == 1 || row == 3 || row == 10) {
                     seatTypes.add("extra_legroom");
                 }
 
