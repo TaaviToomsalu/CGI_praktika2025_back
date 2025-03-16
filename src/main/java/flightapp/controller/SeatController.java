@@ -22,8 +22,8 @@ public class SeatController {
     @GetMapping("/{flightId}")
     public List<Seat> getSeats(@PathVariable Long flightId,
                                @RequestParam(value = "class", required = false) String seatClass) {
-        System.out.println("Fetching seats for flightId: " + flightId);
-        System.out.println("seatClass from frontend: '" + seatClass + "'");
+        //System.out.println("Fetching seats for flightId: " + flightId);
+        //System.out.println("seatClass from frontend: '" + seatClass + "'");
 
         List<Seat> seats = seatService.getSeatsForFlight(flightId);
 
@@ -41,9 +41,12 @@ public class SeatController {
     public List<Seat> suggestSeats(@PathVariable Long flightId,
                                    @RequestParam int numSeats,
                                    @RequestParam List<String> preferences,
-                                    @RequestParam(required = false, defaultValue = "false") boolean requireAdjacent) {
+                                   @RequestParam(required = false, defaultValue = "false") boolean requireAdjacent,
+                                   @RequestParam String seatClass) {
 
-        return seatService.suggestSeats(flightId, numSeats, preferences, requireAdjacent);
+        System.out.println("Received preferences: " + preferences); // Debugging log
+
+        return seatService.suggestSeats(flightId, numSeats, preferences, requireAdjacent, seatClass);
     }
 
     @GetMapping("/{flightId}/available")

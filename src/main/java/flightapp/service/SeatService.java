@@ -1,6 +1,7 @@
 package flightapp.service;
 
 import flightapp.model.Seat;
+import flightapp.model.SeatClass;
 import flightapp.repository.SeatRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +25,21 @@ public class SeatService {
     public List<Seat> suggestSeats(Long flightId,
                                    int numSeats,
                                    List<String> preferences,
-                                   boolean requireAdjacent) {
+                                   boolean requireAdjacent,
+                                   String seatClass) {
         List<Seat> seats = getSeatsForFlight(flightId);
 
+        SeatClass enumClass;
+        try {
+            enumClass = SeatClass.valueOf(seatClass.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid seat class: " + seatClass);
+            return Collections.emptyList(); // Tagasta tühi list, kui seatClass ei sobi
+        }
 
-        // Filtreeri vabad istekohad
+        // Filtreeri ainult seatClassile vastavad istekohad
         List<Seat> availableSeats = seats.stream()
+                .filter(seat -> seat.getClassType() == enumClass)
                 .filter(seat -> !seat.isOccupied()) // Ainult vabad istekohad
                 .collect(Collectors.toList());
 
